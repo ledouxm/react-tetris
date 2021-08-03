@@ -1,6 +1,7 @@
 import { Center, ChakraProvider, extendTheme, Flex } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "./App.css";
+import { Game } from "./Game";
 import { Tetris } from "./Tetris";
 
 const theme = extendTheme({ config: { initialColorMode: "light" } });
@@ -12,7 +13,7 @@ function App() {
             <ChakraProvider theme={theme}>
                 <Flex direction="column" boxSize="100%">
                     <Center alignSelf="center">
-                        <Tetris />
+                        <Game />
                     </Center>
                 </Flex>
             </ChakraProvider>

@@ -22,57 +22,51 @@ import { computeScore, findAllMoves, findBestMove, getNbHoles, getPeaks, Ia } fr
 import { Controller, useForm } from "react-hook-form";
 import { ConfigData } from "./game/iaConfig";
 import { getHoles } from "./game/pomped";
+import { Generation } from "./game/generation";
 
 export type Grid = string[][];
 export const EMPTY_CELL = "*";
 export const makeLine = () => makeArrayOf(10).map(() => EMPTY_CELL);
-const makeGrid = () => makeArrayOf(20).map(makeLine);
+export const makeGrid = () => makeArrayOf(20).map(makeLine);
 
 const logGrid = (grid: Grid) => grid.forEach((row) => console.log(row.join(" ")));
 // const getBestGame = async () => (await api.get("/game/best")).data;
 export const Tetris = () => {
-    const [game, setGame] = useState(null);
+    const [currentGame, setCurrentGame] = useState<Game>();
 
-    const iaRef = useRef<Ia>(null);
-    const gameRef = useRef(new Game());
+    const generationRef = useRef<Generation>(new Generation());
 
     const update = (game: Game) => {
-        setGame(game);
+        setCurrentGame(game);
     };
-
-    const reset = (newConfig?: ConfigData) => {
-        gameRef.current = new Game();
-        gameRef.current.start(update);
-        iaRef.current = new Ia([gameRef.current], newConfig);
-    };
-
-    useEffect(() => {
-        gameRef.current.start(update);
-        iaRef.current = new Ia([gameRef.current]);
-    }, []);
-
-    if (!game) return <Spinner />;
 
     return (
         <Stack>
             <Stack direction="row">
-                <TetrisGame game={game} />
+                {/* <TetrisGame game={currentGame} /> */}
                 <Stack>
-                    <TetrisGrid grid={game.grid} />
-                    <Button onClick={() => iaRef.current?.playAMove(gameRef.current)}>Play</Button>
-                    <Button onClick={() => reset()}>Reset</Button>
+                    <TetrisGrid grid={currentGame?.grid} />
+                    <Button onClick={() => generationRef.current.startOnePopulation(update)}>
+                        Play
+                    </Button>
                 </Stack>
-                <Stack>
-                    <TetrisConfig ia={iaRef.current} onSubmit={reset} />
-                </Stack>
+                <Stack></Stack>
             </Stack>
         </Stack>
     );
 };
 
-const TetrisConfig = ({ ia, onSubmit }: { ia: Ia; onSubmit: (config: ConfigData) => void }) => {
+export const TetrisConfig = ({
+    ia,
+    onSubmit,
+}: {
+    ia: Ia;
+    onSubmit?: (config: ConfigData) => void;
+}) => {
     const defaultValues = { ...omit(ia.config, ["toString"]) };
     const { handleSubmit, control, watch, setValue } = useForm({ defaultValues });
+
+    const isEditable = !!onSubmit;
 
     useEffect(() => {
         if (!defaultValues) return;
@@ -100,6 +94,7 @@ const TetrisConfig = ({ ia, onSubmit }: { ia: Ia; onSubmit: (config: ConfigData)
                                     min={-1}
                                     max={1}
                                     step={0.01}
+                                    disabled={!isEditable}
                                     {...field}
                                 >
                                     <SliderTrack bg="red.100">
@@ -115,21 +110,21 @@ const TetrisConfig = ({ ia, onSubmit }: { ia: Ia; onSubmit: (config: ConfigData)
                         />
                     </Stack>
                 ))}
-                <Button type="submit">Update</Button>
+                {isEditable && <Button type="submit">Update</Button>}
             </Stack>
         </form>
     );
 };
 
-const TetrisGame = ({ game }: { game: Game }) => {
+const TetrisGame = ({ game }: { game?: Game }) => {
     return (
         <Stack>
-            <Box>Status: {game.status}</Box>
-            <Box>Score: {game.score}</Box>
-            <Box>Nb cleared lines: {game.nbClearedLines}</Box>
-            <Box>Nb piece: {game.nbPiece}</Box>
-            <Box>Calculated holes: {getNbHoles(game.grid).nbHoles}</Box>
-            <Box>Calculated peaks: {getPeaks(game.grid).join(", ")}</Box>
+            <Box>Status: {game?.status}</Box>
+            <Box>Score: {game?.score}</Box>
+            <Box>Nb cleared lines: {game?.nbClearedLines}</Box>
+            <Box>Nb piece: {game?.nbPiece}</Box>
+            <Box>Calculated holes: {getNbHoles(game?.grid).nbHoles}</Box>
+            <Box>Calculated peaks: {getPeaks(game?.grid).join(", ")}</Box>
         </Stack>
     );
 };
@@ -142,10 +137,10 @@ const useGrid = () => {
     // const setPiece = ()
 };
 
-const TetrisGrid = ({ grid }: { grid: Grid }) => {
+export const TetrisGrid = ({ grid }: { grid?: Grid }) => {
     return (
         <Flex direction="column">
-            {grid.map((row, x) => (
+            {(grid || makeGrid()).map((row, x) => (
                 <Flex key={x}>
                     {row.map((cell, y) => (
                         <Square key={y} size="40px" bgColor={colorByPieceName[cell]} color="black">
