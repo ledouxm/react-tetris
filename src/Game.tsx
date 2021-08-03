@@ -1,10 +1,9 @@
-import { Box, Button, Stack } from "@chakra-ui/react";
+import { Box, Button, Center, Stack } from "@chakra-ui/react";
 import { useState } from "react";
 import { useQuery } from "react-query";
 import { api } from "./api";
-import { CURRENT_CELL, EMPTY_CELL } from "./game/game";
-import { clone } from "./game/pomped";
-import { Grid, makeGrid, makeLine, TetrisGrid } from "./Tetris";
+import { makeGrid, makeLine, TetrisGrid } from "./Tetris";
+import { clone, CURRENT_CELL, EMPTY_CELL, Grid } from "./utils";
 
 interface Move {
     cells: { x: number; y: number }[];
@@ -21,12 +20,12 @@ const getLinesToClear = (grid: Grid) => {
 };
 
 const getBestGame = async () => (await api.get("/game/best")).data;
+
 export const Game = () => {
     const [grid, setGrid] = useState(makeGrid());
     const [currentMove, setCurrentMove] = useState(0);
 
     const { data: bestGame } = useQuery("bestGame", getBestGame);
-
     const playMove = (move: Move) => {
         const newGrid = clone(grid);
         move.cells.forEach((coord) => (newGrid[coord.x][coord.y] = move.piece));
@@ -57,14 +56,18 @@ export const Game = () => {
         setCurrentMove(0);
     };
 
-    if (!bestGame) return "no data";
+    if (!bestGame) return <Box>no data</Box>;
 
     return (
-        <Stack>
-            <Box>Generation no {bestGame.generation}</Box>
-            <TetrisGrid grid={grid} />
-            <Button onClick={() => nextMove()}>Next move</Button>
-            <Button onClick={() => reset()}>Reset</Button>
-        </Stack>
+        <Center>
+            <Stack>
+                <Box>
+                    Generation no {bestGame.generation} - {bestGame.score}
+                </Box>
+                <TetrisGrid grid={grid} />
+                <Button onClick={() => nextMove()}>Next move</Button>
+                <Button onClick={() => reset()}>Reset</Button>
+            </Stack>
+        </Center>
     );
 };
