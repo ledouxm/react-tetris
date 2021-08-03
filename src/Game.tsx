@@ -46,7 +46,6 @@ export const Game = () => {
 
     const nextMove = () => {
         if (currentMove >= bestGame.moves.length) return;
-        console.log(bestGame?.moves[currentMove]);
         playMove(bestGame?.moves[currentMove]);
         setCurrentMove((currentMove) => currentMove + 1);
     };
