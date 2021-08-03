@@ -1,26 +1,23 @@
 import { Center, ChakraProvider, extendTheme, Flex } from "@chakra-ui/react";
+import { QueryClient, QueryClientProvider } from "react-query";
 import "./App.css";
+import { Tetris } from "./Tetris";
 
 const theme = extendTheme({ config: { initialColorMode: "light" } });
+const queryClient = new QueryClient();
 
 function App() {
-  return (
-    <ChakraProvider theme={theme}>
-      <Flex direction="column" boxSize="100%">
-        <Center
-          my={["20px", "40px"]}
-          px={[0, "4"]}
-          maxW="1200px"
-          alignSelf="center"
-        >
-          {/* TODO */}
-        </Center>
-        <Center p={[0, "8"]} pt="0" h="100%">
-          {/* TODO*/}
-        </Center>
-      </Flex>
-    </ChakraProvider>
-  );
+    return (
+        <QueryClientProvider client={queryClient}>
+            <ChakraProvider theme={theme}>
+                <Flex direction="column" boxSize="100%">
+                    <Center alignSelf="center">
+                        <Tetris />
+                    </Center>
+                </Flex>
+            </ChakraProvider>
+        </QueryClientProvider>
+    );
 }
 
 export default App;
