@@ -1,7 +1,14 @@
-import { Box, Center, ChakraProvider, extendTheme, Flex, Stack } from "@chakra-ui/react";
+import {
+    Box,
+    Center,
+    ChakraProvider,
+    extendTheme,
+    Flex,
+    Stack,
+} from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "./App.css";
-import { Evolutions } from "./Evolutions";
+import { Evolutions } from "./pages/Evolutions";
 import {
     BrowserRouter as Router,
     Route,
@@ -13,8 +20,9 @@ import {
 } from "react-router-dom";
 import { Game } from "./Game";
 import { ReactNode } from "react";
+import { PlayGame } from "./pages/Play";
 
-const theme = extendTheme({ config: { initialColorMode: "light" } });
+const theme = extendTheme({ config: { initialColorMode: "dark" } });
 const queryClient = new QueryClient();
 
 function App() {
@@ -27,6 +35,9 @@ function App() {
                         <Switch>
                             <Route path="/evolutions">
                                 <Evolutions />
+                            </Route>
+                            <Route path="/play">
+                                <PlayGame />
                             </Route>
                             <Route path="/">
                                 <Game />
@@ -44,17 +55,27 @@ const Navbar = () => {
         <Box w="100vw" h="80px" maxH="80px" bg="black">
             <Stack direction="row" alignItems="center" h="100%">
                 <AppLink to="/">Home</AppLink>
+                <AppLink to="/play">Play</AppLink>
                 <AppLink to="/evolutions">Evolutions</AppLink>
             </Stack>
         </Box>
     );
 };
 
-const AppLink = ({ children, to, ...props }: { children: ReactNode; to: string } & LinkProps) => {
+const AppLink = ({
+    children,
+    to,
+    ...props
+}: { children: ReactNode; to: string } & LinkProps) => {
     const isActive = useRouteMatch({ path: to, exact: true });
     return (
         <NavLink to={to} {...props}>
-            <Box fontSize="16px" h="100%" px="20px" fontWeight={isActive ? "bold" : "normal"}>
+            <Box
+                fontSize="16px"
+                h="100%"
+                px="20px"
+                fontWeight={isActive ? "bold" : "normal"}
+            >
                 {children}
             </Box>
         </NavLink>

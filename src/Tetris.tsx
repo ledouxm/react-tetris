@@ -1,6 +1,6 @@
 import { Flex, Square } from "@chakra-ui/react";
 import { makeArrayOf } from "@pastable/core";
-import { EMPTY_CELL, Grid } from "./utils";
+import { colorByPieceName, EMPTY_CELL, Grid } from "./utils";
 
 export const makeLine = () => makeArrayOf(10).map(() => EMPTY_CELL);
 export const makeGrid = () => makeArrayOf(20).map(makeLine);
@@ -23,16 +23,4 @@ export const TetrisGrid = ({ grid }: { grid?: Grid }) => {
             ))}
         </Flex>
     );
-};
-
-const colorByPieceName: Record<string, string> = {
-    I: "#264653",
-    J: "#2a9d8f",
-    L: "#8AB17D",
-    Z: "#BABB74",
-    S: "#E9C46A",
-    O: "#F4A261",
-    T: "#E76F51",
-    "*": "white",
-    "#": "orange",
 };

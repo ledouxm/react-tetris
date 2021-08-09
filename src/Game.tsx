@@ -1,7 +1,10 @@
 import { Box, Button, Center, Stack } from "@chakra-ui/react";
+import { useRef } from "react";
+import { useEffect } from "react";
 import { useState } from "react";
 import { useQuery } from "react-query";
 import { api } from "./api";
+import { BestGame } from "./pages/BestGame";
 import { makeGrid, makeLine, TetrisGrid } from "./Tetris";
 import { clone, CURRENT_CELL, EMPTY_CELL, Grid } from "./utils";
 
@@ -12,7 +15,11 @@ interface Move {
 
 const getLinesToClear = (grid: Grid) => {
     return grid.reduce((arr, currentRow, currentIndex) => {
-        if (currentRow.every((cell) => cell !== EMPTY_CELL && cell !== CURRENT_CELL)) {
+        if (
+            currentRow.every(
+                (cell) => cell !== EMPTY_CELL && cell !== CURRENT_CELL
+            )
+        ) {
             arr.push(currentIndex);
         }
         return arr;
@@ -21,52 +28,15 @@ const getLinesToClear = (grid: Grid) => {
 
 const getBestGame = async () => (await api.get("/game/best")).data;
 
+const interval = 200;
 export const Game = () => {
-    const [grid, setGrid] = useState(makeGrid());
-    const [currentMove, setCurrentMove] = useState(0);
-
     const { data: bestGame } = useQuery("bestGame", getBestGame);
-    const playMove = (move: Move) => {
-        const newGrid = clone(grid);
-        move.cells.forEach((coord) => (newGrid[coord.x][coord.y] = move.piece));
-        checkTetrisAndDisplay(newGrid);
-    };
-
-    const checkTetrisAndDisplay = (grid: Grid) => {
-        const newGrid = clone(grid);
-        const linesToClear = getLinesToClear(newGrid);
-
-        linesToClear.forEach((lineIndex) => {
-            newGrid.splice(lineIndex, 1);
-            newGrid.unshift(makeLine());
-        });
-
-        setGrid(newGrid);
-    };
-
-    const nextMove = () => {
-        if (currentMove >= bestGame.moves.length) return;
-        playMove(bestGame?.moves[currentMove]);
-        setCurrentMove((currentMove) => currentMove + 1);
-    };
-
-    const reset = () => {
-        setGrid(makeGrid());
-        setCurrentMove(0);
-    };
 
     if (!bestGame) return <Box>no data</Box>;
 
     return (
         <Center>
-            <Stack>
-                <Box>
-                    Generation no {bestGame.generation} - {bestGame.score}
-                </Box>
-                <TetrisGrid grid={grid} />
-                <Button onClick={() => nextMove()}>Next move</Button>
-                <Button onClick={() => reset()}>Reset</Button>
-            </Stack>
+            <BestGame bestGame={bestGame} />
         </Center>
     );
 };
