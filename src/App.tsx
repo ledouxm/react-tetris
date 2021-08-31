@@ -1,7 +1,7 @@
 import { ChakraProvider, extendTheme, Flex } from "@chakra-ui/react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import "./App.css";
-import { Demo } from "./components/Demo";
+import { AppCanvas } from "./components/AppCanvas";
 
 const queryClient = new QueryClient();
 
@@ -12,7 +12,7 @@ function App() {
         <QueryClientProvider client={queryClient}>
             <ChakraProvider theme={theme}>
                 <Flex direction="column" boxSize="100%">
-                    <Demo />
+                    <AppCanvas />
                 </Flex>
             </ChakraProvider>
         </QueryClientProvider>
